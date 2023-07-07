@@ -7,7 +7,6 @@ import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomi
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,25 +24,26 @@ public class VirtualThreadsApplication {
 	
 	@GetMapping("/lowLatency")
     public String sayHello() {
-		return "hello";
+		String url = "http://localhost:8080/lowLatency";
+		return new RestTemplate().getForObject(url, String.class);
 	}
 
 	@GetMapping("/latency")
 	public String sayHi(@RequestParam(value = "seconds", defaultValue = "30") Integer seconds) {
-		try {
-			Thread.sleep(seconds*1000);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-		return "hello";
+		String url = "http://localhost:8080/latency?seconds="+seconds;
+		return new RestTemplate().getForObject(url, String.class);
 	}
 
-	/*@Bean
+	@Bean
 	TomcatProtocolHandlerCustomizer<?> protocolHandlerVirtualThreadExecutorCustomizer() {
 		return protocolHandler -> {
 			protocolHandler.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
 		};
-	}*/
+	}
 
+	@Bean(TaskExecutionAutoConfiguration.APPLICATION_TASK_EXECUTOR_BEAN_NAME)
+	public AsyncTaskExecutor asyncTaskExecutor() {
+		return new TaskExecutorAdapter(Executors.newVirtualThreadPerTaskExecutor());
+	}
 
 }
