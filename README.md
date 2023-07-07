@@ -3,7 +3,7 @@ To study and understand the capability of virtual threads
 
 ## Contents
 * Two spring boot applications - one acts as Native Server and another acts as Gateway.
-Both have been committed using Virtual Threads but easy to comment out to disable Virtual Threads.
+<br> (Both have been committed using Virtual Threads but easy to comment out to disable Virtual Threads)
 
    * gateway-app
    * nativeserver-app
